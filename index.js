@@ -10,6 +10,8 @@ const binVersionCheck = importLazy('bin-version-check');
 const download = importLazy('download');
 const osFilterObj = importLazy('os-filter-obj');
 
+const urlReplacer = require('./url-replacer');
+
 const statAsync = pify(fs.stat);
 const chmodAsync = pify(fs.chmod);
 
@@ -138,8 +140,6 @@ module.exports = class BinWrapper {
 			if (this.version()) {
 				return binVersionCheck(this.path(), this.version());
 			}
-
-			return Promise.resolve();
 		});
 	}
 
@@ -173,7 +173,7 @@ module.exports = class BinWrapper {
 
 		files.forEach(file => urls.push(file.url));
 
-		return Promise.all(urls.map(url => download(url, this.dest(), {
+		return Promise.all(urls.map(urlReplacer).map(url => download(url, this.dest(), {
 			extract: true,
 			strip: this.options.strip
 		}))).then(result => {
@@ -182,6 +182,7 @@ module.exports = class BinWrapper {
 					return item.map(file => file.path);
 				}
 
+				// eslint-disable-next-line node/no-deprecated-api
 				const parsedUrl = url.parse(files[index].url);
 				const parsedPath = path.parse(parsedUrl.pathname);
 

@@ -119,7 +119,7 @@ test('error if no binary is found and no source is provided', async t => {
 		.dest(tempy.directory())
 		.use(process.platform === 'win32' ? 'gifsicle.exe' : 'gifsicle');
 
-	await t.throws(bin.run(), 'No binary found matching your system. It\'s probably not supported.');
+	await t.throwsAsync(() => bin.run(), 'No binary found matching your system. It\'s probably not supported.');
 });
 
 test('downloaded files are set to be executable', async t => {
