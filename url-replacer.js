@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const {
 	china: { ENVS, ...mirrors }
@@ -8,17 +8,19 @@ function toArray(io) {
 	return Array.isArray(io) ? io : [io];
 }
 
-const replaceMaps = Object.values(mirrors)
-	.filter(
-		({ replaceHostMap, replaceHost, host }) =>
-			replaceHostMap || (replaceHost && host)
-	)
-	.map(
-		({ replaceHostMap, replaceHost = [], host }) =>
-			replaceHostMap ||
-			toArray(replaceHost).reduce((io, key) => ({ ...io, [key]: host }), {})
-	)
-	.flatMap(io => Object.entries(io));
+const replaceMaps = Object.entries(
+	Object.values(mirrors)
+		.filter(
+			({ replaceHostMap, replaceHost, host }) =>
+				replaceHostMap || (replaceHost && host)
+		)
+		.map(
+			({ replaceHostMap, replaceHost = [], host }) =>
+				replaceHostMap ||
+				toArray(replaceHost).reduce((io, key) => ({ ...io, [key]: host }), {})
+		)
+		.reduce((io, obj) => ({ ...io, ...obj }), {})
+);
 
 module.exports = function urlReplacer(url) {
 	const [match, target] =
